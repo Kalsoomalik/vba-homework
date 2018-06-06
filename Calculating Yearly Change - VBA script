@@ -1,0 +1,91 @@
+' Creating script to show Yearly change from what the stock opened the year at to what the closing price was.
+' Also, calculating Greatest % increase and Greatest % decrease. Applying the same script to all active worksheets.
+
+Sub Change():
+
+' Declaring variables to their types
+Dim open_value As Double
+Dim close_value As Double
+Dim gp_increase As Double
+Dim gp_decrease As Double
+Dim gp_increase_ticker As String
+Dim gp_decrease_ticker As String
+Dim percent_value As Double
+
+' Declare ws as a worksheet object variable.
+Dim ws As Worksheet
+
+ ' Loop through all of the worksheets in the active workbook.
+ For Each ws In Worksheets
+       
+      With ws
+
+      'This line displays the worksheet name in a message box.
+      MsgBox "Now Processing: " + ws.Name
+
+      ' Initializing from where data begins
+      difference_location = 2
+
+      ' Creating switch to start and stop at specific cells
+      initialized = False
+
+        percent_value = 0
+        gp_increase = 0
+        gp_increase_ticker = ""
+        gp_decrease = 0
+        gp_decrease_ticker = ""
+
+      ' Creating loop
+        For j = 2 To 800000
+
+          'Check if we are still adding the same stock volume
+          If ws.Cells(j + 1, 1).Value = ws.Cells(j, 1).Value Then
+
+            ' Storing open value
+            If (initialized = False) Then
+            open_value = ws.Cells(j, 3).Value
+            initialized = True
+            End If
+            Else
+
+           ' Storing close value of the same year and calculating difference
+            close_value = ws.Cells(j, 6).Value
+            ws.Range("I" & difference_location).Value = (close_value - open_value)
+            
+            If (open_value > 0) Then
+              percent_value = ((close_value - open_value) / open_value)
+              ws.Range("J" & difference_location).Value = percent_value
+              difference_location = difference_location + 1
+
+            ' Calculating greatest percent increase and ticker
+            If (gp_increase < percent_value) Then
+               gp_increase = percent_value
+               gp_increase_ticker = ws.Cells(j, 1).Value
+            End If
+
+             ' Calculating greatest percent decrease and ticker
+             If (percent_value < gp_decrease) Then
+                gp_decrease = percent_value
+                gp_decrease_ticker = ws.Cells(j, 1).Value
+             End If
+
+             End If
+
+            initialized = False
+
+          End If
+
+      Next j
+
+      ' Assigning cells to values
+      ws.Range("N" & 2).Value = gp_increase_ticker
+      ws.Range("O" & 2).Value = (gp_increase)
+
+      ws.Range("N" & 3).Value = gp_decrease_ticker
+      ws.Range("O" & 3).Value = (gp_decrease)
+
+    End With
+        
+    Next
+        
+End Sub
