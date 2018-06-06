@@ -1,0 +1,76 @@
+' Creating script to show Total Stock Volumes with Tickers. Also, showing the Greatest
+' Stock Volume and applying the same script to all the active worksheets.
+
+Sub Stock_Volume():
+    
+' Set an initial variable to show Ticker name
+Dim Ticker As String
+
+' Set a column to show Total Volume
+Dim TotalStockVolume As Long
+
+' Keep track of where to print the stock name
+Dim Tickerlocation As Integer
+Tickerlocation = 2
+
+' Locating Greatest Volume Stock
+Dim greatest_stock_volume As Long
+Dim gsv_ticker As String
+
+' Declare ws as a worksheet object variable.
+Dim ws As Worksheet
+
+' Loop through all of the worksheets in the active workbook.
+For Each ws In Worksheets
+       With ws
+           'This line displays the worksheet name in a message box.
+            MsgBox "Now Processing: " + ws.Name
+               
+            volume_total = 0
+            Ticker = ""
+            Tickerlocation = 2
+            greatest_stock_volume = 0
+            gsv_ticker = ""
+               
+               
+             ' Loop through all Tickers or Stock names
+               For j = 2 To 800000
+                           
+                  'Check if we are still adding the same stock volume
+                   If ws.Cells(j + 1, 1).Value <> ws.Cells(j, 1).Value Then
+                             
+                  ' Start Volume Total from 0
+                    volume_total = 0
+                                       
+                         'Set the Ticker name
+                          Ticker = ws.Cells(j, 1).Value
+
+                         'Adding Volume Total
+                          volume_total = volume_total + ws.Cells(j, 7).Value
+
+                         'Print stock name in column H
+                          ws.Range("H" & Tickerlocation).Value = Ticker
+
+                         'Print Total Stock Volume in column I
+                          ws.Range("K" & Tickerlocation).Value = volume_total
+                          If (greatest_stock_volume < volume_total) Then
+                             greatest_stock_volume = volume_total
+                             gsv_ticker = ws.Cells(j, 1).Value
+                          End If
+
+                         ' Adding the next row to location
+                          Tickerlocation = Tickerlocation + 1
+                           Else
+                        ' Print Volume Total location
+                          volume_total = volume_total + ws.Cells(j, 7).Value
+                         End If
+               Next j
+                        ws.Range("N" & 4).Value = gsv_ticker
+                        ws.Range("O" & 4).Value = greatest_stock_volume
+       
+       End With
+
+Next
+                    
+End Sub
+
